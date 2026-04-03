@@ -1,7 +1,17 @@
 pipeline {
     agent any
 
+    environment {
+        TF_IN_AUTOMATION = "true"
+    }
+
     stages {
+
+        stage('Checkout') {
+            steps {
+                checkout scm
+            }
+        }
 
         stage('Terraform Init') {
             steps {
@@ -9,10 +19,52 @@ pipeline {
             }
         }
 
+        stage('Terraform Format Check') {
+            steps {
+                sh 'terraform fmt -check'
+            }
+        }
+
+        stage('Terraform Validate') {
+            steps {
+                sh 'terraform validate'
+            }
+        }
+
         stage('Terraform Plan') {
             steps {
-                sh 'terraform plan'
+                sh '''
+                terraform plan -out=tfplan
+                terraform show tfplan
+                '''
+            }
+        }
+
+        stage('Terraform Apply') {
+            when {
+                branch 'main'
+            }
+            steps {
+                input message: "Approve Terraform Apply?"
+                sh 'terraform apply -auto-approve tfplan'
             }
         }
     }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
