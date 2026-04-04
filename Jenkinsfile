@@ -3,6 +3,7 @@ pipeline {
 
     environment {
         TF_IN_AUTOMATION = "true"
+        EMAIL_RECIPIENT = "harinatha.naidu@nam-it.com"   // change this
     }
 
     stages {
@@ -40,6 +41,32 @@ pipeline {
             }
         }
 
+        stage('Approval Required') {
+            when {
+                branch 'main'
+            }
+            steps {
+                script {
+                    emailext (
+                        subject: "Jenkins Approval Required: Terraform Apply",
+                        body: """
+                        Hello,
+
+                        Terraform plan is ready for APPLY.
+
+                        Please review and approve in Jenkins:
+
+                        ${env.BUILD_URL}
+
+                        Thanks,
+                        Jenkins
+                        """,
+                        to: "${EMAIL_RECIPIENT}"
+                    )
+                }
+            }
+        }
+
         stage('Terraform Apply') {
             when {
                 branch 'main'
@@ -51,20 +78,3 @@ pipeline {
         }
     }
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
