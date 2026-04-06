@@ -1,9 +1,12 @@
+provider "aws" {
+  region = "us-west-2"
+}
 
-resource "aws_instance" "test" {
-  ami           = "ami-0c2d3e23c2b8d84f0"  # Amazon Linux 2023 - us-west-2
+resource "aws_instance" "demo" {
+  ami           = "ami-0c55b159cbfafe1f0"
   instance_type = "t2.micro"
 
   tags = {
-    Name = "test-instance"
+    Name = "terraform-demo"
   }
 }
