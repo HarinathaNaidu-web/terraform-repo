@@ -1,28 +1,17 @@
 pipeline {
     agent any
 
-    environment {
-        TF_IN_AUTOMATION = "true"
-        EMAIL_RECIPIENT = "harinatha.naidu@nam-it.com"   // change this
-    }
-
     stages {
-
         stage('Checkout') {
             steps {
-                checkout scm
+                git branch: 'main',
+                url: 'https://github.com/HarinathaNaidu-web/terraform-repo.git'
             }
         }
 
         stage('Terraform Init') {
             steps {
                 sh 'terraform init'
-            }
-        }
-
-        stage('Terraform Format Check') {
-            steps {
-                sh 'terraform fmt -check'
             }
         }
 
@@ -34,46 +23,19 @@ pipeline {
 
         stage('Terraform Plan') {
             steps {
-                sh '''
-                terraform plan -out=tfplan
-                terraform show tfplan
-                '''
+                sh 'terraform plan'
             }
         }
 
-        stage('Approval Required') {
-            when {
-                branch 'main'
-            }
+        stage('Approval') {
             steps {
-                script {
-                    emailext (
-                        subject: "Jenkins Approval Required: Terraform Apply",
-                        body: """
-                        Hello,
-
-                        Terraform plan is ready for APPLY.
-
-                        Please review and approve in Jenkins:
-
-                        ${env.BUILD_URL}
-
-                        Thanks,
-                        Jenkins
-                        """,
-                        to: "${EMAIL_RECIPIENT}"
-                    )
-                }
+                input message: 'Approve Terraform Apply?'
             }
         }
 
         stage('Terraform Apply') {
-            when {
-                branch 'main'
-            }
             steps {
-                input message: "Approve Terraform Apply?"
-                sh 'terraform apply -auto-approve tfplan'
+                sh 'terraform apply -auto-approve'
             }
         }
     }
