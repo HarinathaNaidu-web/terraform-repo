@@ -27,15 +27,23 @@ pipeline {
             }
         }
 
-        stage('Approval') {
+        stage('Approval & Apply/Destroy') {
             steps {
-                input message: 'Approve Terraform Apply?'
-            }
-        }
+                script {
+                    try {
+                        // Approval step
+                        input message: 'Approve Terraform Apply?', ok: 'Apply'
 
-        stage('Terraform Apply') {
-            steps {
-                sh 'terraform apply -auto-approve'
+                        // If approved → Apply
+                        echo "Approval received. Running Terraform Apply..."
+                        sh 'terraform apply -auto-approve'
+
+                    } catch (err) {
+                        // If denied/aborted → Destroy
+                        echo "Approval denied or aborted. Running Terraform Destroy..."
+                        sh 'terraform destroy -auto-approve'
+                    }
+                }
             }
         }
     }
