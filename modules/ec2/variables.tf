@@ -1,7 +1,5 @@
-variable "ami_id" {
-  type = string
-}
+variable "ami_id" {}
+variable "instance_type" {}
 
-variable "instance_type" {
-  type = string
-}
+variable "subnet_id" {}
+variable "security_group_id" {}
