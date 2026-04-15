@@ -1,3 +1,6 @@
 bucket_name   = "hm-inferyx-emr-logs-839201"
 ami_id        = "ami-0d70546e43a941d70"
 instance_type = "t2.micro"
+vpc_id            = "vpc-0833433f2a95f0b32"
+subnet_id         = "subnet-00386b7970d4d15bd"
+security_group_id = "sg-019dcf297021d8005"
